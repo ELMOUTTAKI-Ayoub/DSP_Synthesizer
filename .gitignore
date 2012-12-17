@@ -1,0 +1,7 @@
+nbproject/*
+*~
+.buildpath
+.metadata/
+.project
+.settings/
+
