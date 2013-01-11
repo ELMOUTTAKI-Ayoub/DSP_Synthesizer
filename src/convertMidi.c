@@ -9,7 +9,10 @@ long lSize;
 char* buffer;
 size_t result;
 
-// Setzen des Verbosemode's
+/*
+ * Wünscht der der Nutzer die Ausgabe der kompletten Datei ASCII-kodiert,
+ * so hat er den Verbose Mode mit dem Parameter -v aktiviert.
+ */
 if (argc>1 && argv[1][1]=='v') {
 	verbose++;
 	printf("Verbose aktiviert!\n");
@@ -20,7 +23,10 @@ if ((pFile = fopen(MIDI_FILE, "rb")) == NULL) {
 	exit(1);
 }
 
-// Dateigröße ermitteln
+/*
+ * Der Dateizeiger wird mit dem Aufruf von fseek() ans Ende der Datei gesetzt
+ * und sollte somit für das spätere einlesen wieder an den Anfang gesetzt werden.
+ */
 fseek (pFile , 0 , SEEK_END);
 lSize = ftell (pFile);
 rewind (pFile);
@@ -39,16 +45,16 @@ if ((result = fread (buffer,1,lSize,pFile)) != lSize) {
 
 printf ("Ausgabe der Datei %s\n", MIDI_FILE);
 for (int i=0; i < lSize; ++i) {
-	static unsigned char trkNmbr = 0;
+	static unsigned char trkNmbr = 1;
 
 	if (memcmp(&buffer[i],HEADER_CHUNK,HEADER_BYTES) == 0) {
-		struct headerChunk sample;
+		headerChunk sample;
 		i += convertHeader(&sample, &buffer[i]);
 
 		printf("HEADER:\tKennung:%X Size:%i enthält %s, %i Tracks und %i Delta Time-ticks pro Viertelnote",sample.header.header,sample.size.size,HEADER_MSG[sample.field.field[2]],sample.field.field[1],sample.field.field[0]);
 	}
-	if (memcmp(&buffer[i],TRACK_CHUNK,TRACK_BYTES) == 0) {
-		struct trackChunk sample;
+	else if (memcmp(&buffer[i],TRACK_CHUNK,TRACK_BYTES) == 0) {
+		trackChunk sample;
 		i += convertTrack(&sample, &buffer[i]);
 
 		printf("\nTRACK:\tNummer %u gefunden, mit einer Länge von %i-Bytes", trkNmbr++, sample.size.size);

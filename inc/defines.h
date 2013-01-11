@@ -50,50 +50,50 @@ static const char* HEADER_MSG[] = 	{"eine Spur","mehrere synchrone Spuren","mehr
 /**************************************************************************************************/
 
 /* Definitionen komplexer Datentypen */
-typedef union header {						// Header Daten des HEADERS oder TRACKs
+typedef union {						// Header Daten des HEADERS oder TRACKs
 	unsigned char		data[HEADER_BYTES];
 	int32_t 			header;
-};
+} header;
 
-typedef union chunk {						// repräsentiert einen Chunk, HEADER oder TRACK
+typedef union {						// repräsentiert einen Chunk, HEADER oder TRACK
 	unsigned char		data[TRACK_BYTES];
 	int32_t 			chunk;
-};
+} chunk;
 
-typedef union size {
+typedef union {
 	unsigned char		data[HEADER_BYTES];
 	int32_t 			size;
-};
+} size;
 
-typedef union field {						// dieses Datenfeld existiert nur im Header
+typedef union {						// dieses Datenfeld existiert nur im Header
 	unsigned char		data[HEADER_SIZE];
 	int16_t				field[HEADER_SIZE/2];
-};
+} field;
 
-typedef struct command {							// das Kommando besteht aus zwei Bytes
+typedef struct {							// das Kommando besteht aus zwei Bytes
 	int16_t				command			: 4;// welche Nibble-Weise Informationen enthalten
 	int16_t				channel			: 4;
 	int16_t				noteNumber		: 4;
 	int16_t				noteVelocity 	: 4;
-};
+} command;
 
-typedef struct headerChunk {
-	union header 		header;
-	union size			size;
-	union field 		field;
-};
+typedef struct {
+	header 		header;
+	size			size;
+	field 		field;
+} headerChunk;
 
-typedef struct trackChunk {
-	union chunk 		chunk;
-	union size			size;
-};
+typedef struct {
+	chunk 		chunk;
+	size			size;
+} trackChunk;
 
-typedef struct midiTracks {				// Typedef welches die Tracks der weiteren
+typedef struct {				// Typedef welches die Tracks der weiteren
 	int8_t 				numTracks;		// Verarbeitung zur Verfügung stellt
-	struct trackChunk* 	tracks;
-	struct command**	commands;
-} midiTracks_t;
+	trackChunk* 	tracks;
+	command**	commands;
+} midiTracks;
 
-extern midiTracks_t globalTracks;
+extern midiTracks globalTracks;
 
 #endif /* DEFINES_H_ */

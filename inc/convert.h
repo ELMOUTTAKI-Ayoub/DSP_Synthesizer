@@ -3,9 +3,9 @@
 
 #include "defines.h"
 
-int convertHeader (struct headerChunk* sample, const char* index);
+int convertHeader (headerChunk* sample, const char* index);
 
-int convertTrack (struct trackChunk* sample, const char* index);
+int convertTrack (trackChunk* sample, const char* index);
 
 
 #endif /* CONVERT_H_ */

@@ -2,7 +2,7 @@
 #include "defines.h"
 #include <string.h>
 
-int convertHeader (struct headerChunk* sample, const char* index){
+int convertHeader (headerChunk* sample, const char* index){
 	unsigned char offset = 0;
 
 	memcpy(sample->header.data, &index[offset], HEADER_BYTES);
@@ -29,7 +29,7 @@ int convertHeader (struct headerChunk* sample, const char* index){
 	return (2*HEADER_SIZE+HEADER_BYTES);
 }
 
-int convertTrack (struct trackChunk* sample, const char* index){
+int convertTrack (trackChunk* sample, const char* index){
 	unsigned char offset = 0;
 
 	memcpy(sample->chunk.data, &index[offset], TRACK_BYTES);
