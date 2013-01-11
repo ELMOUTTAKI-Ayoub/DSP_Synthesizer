@@ -1,7 +1,10 @@
 nbproject/*
 *~
+*.o
+*.d
 .buildpath
 .metadata/
+.cproject
 .project
 .settings/
-
+playMeOlder.mid
