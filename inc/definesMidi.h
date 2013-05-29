@@ -43,7 +43,7 @@ static const char TRACK_CHUNK[] = 	{0x4D, 0x54, 0x72, 0x6B};			//ASCII: "MTrk"
 /* Oktaven Offset */
 #define NEXT_OCTAVE					0x000C
 /* MidiDatei */
-#define MIDI_FILE					"playMe.mid"
+#define MIDI_FILE					"quarter.mid"
 /* Textausgaben */
 static const char* HEADER_MSG[] = 	{"eine Spur","mehrere synchrone Spuren","mehrere asynchrone Spuren"};
 
@@ -55,7 +55,7 @@ typedef union {						// Header Daten des HEADERS oder TRACKs
 	int32_t 			header;
 } header;
 
-typedef union {						// reprÃ¤sentiert einen Chunk, HEADER oder TRACK
+typedef union {						// repräsentiert einen Chunk, HEADER oder TRACK
 	unsigned char		data[TRACK_BYTES];
 	int32_t 			chunk;
 } chunk;
@@ -79,7 +79,7 @@ typedef struct {							// das Kommando besteht aus zwei Bytes
 
 typedef struct {
 	header 		header;
-	size			size;
+	size		size;
 	field 		field;
 } headerChunk;
 
@@ -89,7 +89,7 @@ typedef struct {
 } trackChunk;
 
 typedef struct {				// Typedef welches die Tracks der weiteren
-	int8_t 				numTracks;		// Verarbeitung zur VerfÃ¼gung stellt
+	int8_t 				numTracks;		// Verarbeitung zur Verfügung stellt
 	trackChunk* 	tracks;
 	command**	commands;
 } midiTracks;

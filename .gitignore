@@ -2,9 +2,15 @@ nbproject/*
 *~
 *.o
 *.d
+*.ccxml
 .buildpath
 .metadata/
+.launches/
+.settings/
+.ccsproject
+.cdtbuild
+.cdtproject
 .cproject
 .project
-.settings/
+
 playMeOlder.mid
