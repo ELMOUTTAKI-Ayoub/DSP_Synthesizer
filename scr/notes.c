@@ -7,9 +7,12 @@
 #include "notes.h"
 #include "math.h"
 
-note ton;
+note s_note;
 //short sinus[SAMPLE_RATE]; 			//lockup table
-uint8_t tmp, toggle = 1;
+//uint8_t i= 0, toggle= 1;
+union toene;
+
+
 /*
  * Wandelt Ausgelesene Notenummer in eine Frequenz um.
  *
@@ -29,13 +32,17 @@ uint8_t tmp, toggle = 1;
  *	   9  || 108 | 109 | 110 | 111 | 112 | 113 | 114 | 115 | 116 | 117 | 118 | 119
  *	  10  || 120 | 121 | 122 | 123 | 124 | 125 | 126 | 127 |
  */
+
 int create_note (short num) {
 	float div;
 	float c = 8.175798916f;
 
-	/* f= c * 2^(NUM/12)   */
+	/* Berechnung der Frequenz
+	 *
+	 *   f= c * 2^(num/12)
+	 */
 	div=(float)(num)/12.0f;
-	ton.freq =c * powf(2.0f, div);
+	s_note.freq =c * powf(2.0f, div);
 	return (int)(c * powf(2.0f, div));
 	//tmp.octave = (short)(num/12);
 }
@@ -56,13 +63,23 @@ void create_lut_sinus(void) {
 	}
 }
 
+/*
+ * fuellen der Trackspuren mit Signalen
+ */
+void fill_toene (note* track, uint8_t trackCount) {
 
-//Aller 1/128 Note wird diese Funktion ausgeführt
-//void control_time(){
-//
-//	DSK6713_LED_toggle(2);
-//
-//}
+	uint8_t i = 0;
+	//uint8_t array[] = {10,50,69,80,85,90,95,100,105,110,115,120,123,125,126,127};
+	uint8_t a_freq[] = {69,90,105,126};
+	uint16_t a_deltaTime[] = {100,1000,500,5555};    //Die Zeitdifferenz zum vorhergehenden Event. Es ist in variabler LÃ¤nge encodiert.
+
+	while (i < trackCount) {
+		track[i].freq = create_note(a_freq[i]);	// TODO: muss noch angepasst werden...
+		//track[i].counter = 0;
+		track[i].deltaTime = a_deltaTime[i];
+		i++;
+	}
+}
 
 //void volume_up(void) {
 //	volume_DSP = 1/(ton.noteOn) * VOLUME;

@@ -20,7 +20,7 @@
  */
 #define DSK6713_AIC23_INPUT_MIC 	0x0015
 #define DSK6713_AIC23_INPUT_LINE 	0x0011
-#define SAMPLE_RATE 				DSK6713_AIC23_FREQ_8KHZ
+//#define SAMPLE_RATE 				DSK6713_AIC23_FREQ_8KHZ
 /*
  * Software defines
  */
@@ -43,7 +43,7 @@ static const char TRACK_CHUNK[] = 	{0x4D, 0x54, 0x72, 0x6B};			//ASCII: "MTrk"
 /* Oktaven Offset */
 #define NEXT_OCTAVE					0x000C
 /* MidiDatei */
-#define MIDI_FILE					"quarter.mid"
+#define MIDI_FILE					"Tracks/LoopDemo.mid"
 /* Textausgaben */
 static const char* HEADER_MSG[] = 	{"eine Spur","mehrere synchrone Spuren","mehrere asynchrone Spuren"};
 
@@ -55,7 +55,7 @@ typedef union {						// Header Daten des HEADERS oder TRACKs
 	int32_t 			header;
 } header;
 
-typedef union {						// repräsentiert einen Chunk, HEADER oder TRACK
+typedef union {						// repraesentiert einen Chunk, HEADER oder TRACK
 	unsigned char		data[TRACK_BYTES];
 	int32_t 			chunk;
 } chunk;
@@ -78,20 +78,20 @@ typedef struct {							// das Kommando besteht aus zwei Bytes
 } command;
 
 typedef struct {
-	header 		header;
-	size		size;
-	field 		field;
+	header 				header;
+	size				size;
+	field 				field;
 } headerChunk;
 
 typedef struct {
-	chunk 		chunk;
-	size			size;
+	chunk 				chunk;
+	size				size;
 } trackChunk;
 
 typedef struct {				// Typedef welches die Tracks der weiteren
-	int8_t 				numTracks;		// Verarbeitung zur Verfügung stellt
-	trackChunk* 	tracks;
-	command**	commands;
+	int8_t 				numTracks;		// Verarbeitung zur Verfuegung stellt
+	trackChunk* 		tracks;
+	command**			commands;
 } midiTracks;
 
 extern midiTracks globalTracks;
