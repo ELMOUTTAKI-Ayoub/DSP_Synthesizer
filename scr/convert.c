@@ -63,7 +63,7 @@ int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* tr
 	int i;
 
 	/*
-	 * Wünscht der der Nutzer die Ausgabe der kompletten Datei ASCII-kodiert,
+	 * Wünscht der Nutzer die Ausgabe der kompletten Datei ASCII-kodiert,
 	 * so hat er den Verbose Mode mit dem Parameter -v aktiviert.
 	 */
 	if (argc>1 && argv[1][1]=='v') {
