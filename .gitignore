@@ -3,6 +3,7 @@ nbproject/*
 *.o
 *.d
 *.ccxml
+*.mid
 .buildpath
 .metadata/
 .launches/
@@ -12,5 +13,4 @@ nbproject/*
 .cdtproject
 .cproject
 .project
-
-playMeOlder.mid
+Debug/

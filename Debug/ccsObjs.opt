@@ -1,1 +1,0 @@
-"./scr/notes.obj" "./scr/convert.obj" "./main.obj" "./Vectors_intr.obj" -l"libc.a" "../C6713dsk.cmd" "../csl6713.lib" "../dsk6713bsl.lib" 
