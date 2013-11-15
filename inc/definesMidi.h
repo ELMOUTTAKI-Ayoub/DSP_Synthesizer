@@ -71,10 +71,11 @@ typedef union {						// dieses Datenfeld existiert nur im Header
 } field;
 
 typedef struct {							// das Kommando besteht aus zwei Bytes
-	int16_t				command			: 4;// welche Nibble-Weise Informationen enthalten
-	int16_t				channel			: 4;
-	int16_t				noteNumber		: 4;
-	int16_t				noteVelocity 	: 4;
+	uint16_t				command;// welche Nibble-Weise Informationen enthalten
+	uint16_t				channel;
+	uint16_t				deltaTime;
+	uint16_t				noteNumber;
+	uint16_t				noteVelocity;
 } command;
 
 typedef struct {
@@ -86,6 +87,9 @@ typedef struct {
 typedef struct {
 	chunk 				chunk;
 	size				size;
+	uint16_t 			counter;			// Zähler für Sinuserzäugung
+	uint16_t			delayCounter;		// Zähler bis zum nächsten Ereignis
+	int16_t			commandCounter;		// Platzhalter für das aktuell ausführende Event; -1 kein Commando
 } trackChunk;
 
 typedef struct {				// Typedef welches die Tracks der weiteren
