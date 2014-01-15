@@ -1,4 +1,4 @@
-/*
+/**
  * DSP-Bibliotheken
  */
 #include "dsk6713_aic23.h"  			//support file for codec,DSK
@@ -7,7 +7,7 @@
 #include "dsk6713config.h"
 #include "dsk6713.h"
 
-/*
+/**
  * C-Bibliotheken
  */
 #include "stdio.h"
@@ -17,46 +17,65 @@
 #include "notes.h"
 #include "convert.h"
 
-
+/**
+ * Globale Variabelen
+ */
 DSK6713_AIC23_CodecHandle hCodec;
-Uint32 fs = DSK6713_AIC23_FREQ_8KHZ; 	//set sampling rate (8, 16, 44, 96 kHz)
-Uint16 eventId1;
+Uint32 		fs = DSK6713_AIC23_FREQ_44KHZ; 	// setzen der Sampling-Rate (8, 16, 44, 96 kHz)
 
-short counter = 0;
-short index = 0;
-float volume_DSP = 0.5f;
-short oneTick = 0;
-float timePerTick = 0;
-Uint8 FreqDivider = 125; 			// FreqDivider = 8K * timePerTick
-note *track;
-short sinus[8000]; 			//lockup table
+//Uint16 		eventId1;
+midiTracks 	midiSample;
+trackChunk 	midiTrack[16];
+command 	midiCommands[16*200];
+command* 	midiCommandsPointer[16];
+short 		counter = 0;
+short 		index = 0;
+float 		volume_DSP = 1.0f;			// external DSP-Board Volume
+//short oneTick = 0;
+//float timePerTick = 0;
+short 		sinus[SAMPLE_RATE]; 		// Lockup Tabelle
+uint8_t 	tmp, i = 0;
 
-/*
+/**
  * Marc's declatation
  */
-uint8_t trackCount = 1;
-
-extern far void vectors();         //external function
+//uint8_t trackCount = 1;
+/***************************/
 
 /*
  * Aller 1/128 Note wird diese Funktion ausgefuehrt
  */
-void control_time(){
+extern far void vectors();
 
-	DSK6713_LED_toggle(2);
-
-}
-
-interrupt void c_int11(void){  		//interrupt service routine
+/**
+ * Interrupt Service Routine
+ */
+interrupt void c_int11(void){
+	static uint8_t 	t_timeDevision=0;
+	uint8_t 		t_index = 0;
 	
-//	if (FreqDivider == 0){
-//		control_time();
-//		FreqDivider = 125;
-//	}else{
-//		FreqDivider--;
-//	}
 
-	return;									//return from interrupt
+	if(t_timeDevision>15){
+		while (t_index < midiSample.numTracks) {
+			if (midiSample.tracks[t_index].delayCounter == 0) {
+				if(	midiSample.tracks[t_index].commandCounter < midiSample.tracks[t_index].size.size-1){
+					midiSample.tracks[t_index].commandCounter++;
+				}
+				if(	midiSample.tracks[t_index].commandCounter+1 < midiSample.tracks[t_index].size.size){
+					midiSample.tracks[t_index].delayCounter = midiSample.commands[t_index][midiSample.tracks[t_index].commandCounter+1].deltaTime;
+				}
+			}
+			else{
+				midiSample.tracks[t_index].delayCounter--;
+			}
+
+			t_index++;
+		}
+		t_timeDevision=0;
+	}
+	t_timeDevision++;
+
+	return;							//return from interrupt
 }
 
 /*
@@ -105,16 +124,9 @@ void interupt_config() {
 }
 
 
-void main(int argc, char **argv) {
+int main(int argc, char **argv) {
 
-	uint8_t i = 0;
-
-	DSK6713_init(); 						// call BSL to init DSK-EMIF,PLL)
-	interupt_config();
-	DSK6713_LED_init();						//init LED from BSL
-	DSK6713_DIP_init();
-
-	create_lut_sinus();						//fill the Lookup Table with the Sinus-signal
+	union {Uint32 combo;short channel[2];} AIC23_data;
 
 	headerChunk headerSample;
 	trackChunk trackSample;
@@ -131,6 +143,7 @@ void main(int argc, char **argv) {
 	      printf("\nFehler: Es konnten keine Tracks angelegt werden. M�gliche Ursache: Kein freier Speicherplatz vorhanden.");
 	  //    return EXIT_FAILURE;
 	}
+	midiSample.commands = midiCommandsPointer;
 
 	//f�llen der Trackspuren mit Signalen
 //	while (i < trackCount) {
@@ -138,28 +151,34 @@ void main(int argc, char **argv) {
 //		i++;
 //	}
 
-	track[0].freq = create_note(69);
-	track[1].freq = create_note(100);
-	track[2].freq = create_note(80);
+	//oneTick = headerSample.field.field[0] / 32;  								// 1Tick = ( TimeDevision / 1/4Note ) * 1/128Note
+	//timePerTick = oneTick * (QUARTER_NOTE_TIME / headerSample.field.field[0]);	// Laenge einer 1/128 Note
 
-	union {Uint32 combo;short channel[2];} AIC23_data;
+	fill_toene(&midiSample);
+	convert_delta_time(&midiSample);
+	convert_note_number(&midiSample);	// Umwandlung der
 
-//	track[0].counter = 0;
-//	track[1].counter = 0;
-//	track[2].counter = 0;
+	DSK6713_init(); 		// call BSL to init DSK-EMIF,PLL)
+	interupt_config();		// configuration the Interupts
+	DSK6713_LED_init();		// init LED from BSL
 
-	i=0;
 	while (1) {
+		//read next value from codec (poll until value available)
 		while (!DSK6713_AIC23_read(hCodec, &AIC23_data.combo));
 		AIC23_data.combo=0;
 		i=0;
-		while (i < trackCount) {
-			//read next value from codec (poll until value available)
-			// signal processing
-			AIC23_data.channel[LEFT] += volume_DSP*(sinus[track[i].counter])/trackCount;
-			AIC23_data.channel[RIGHT] += volume_DSP*(sinus[track[i].counter])/trackCount;
-			track[i].counter +=(short)track[i].freq;
-			if (track[i].counter > (8000-1)) track[i].counter -= 8000;
+		while (i < midiSample.numTracks) {
+			uint16_t t_data = sinus[midiSample.tracks[i].counter] >> 4;
+			AIC23_data.channel[LEFT] += t_data;
+			AIC23_data.channel[RIGHT] += t_data;
+			// wenn ... und Note ON
+			if(midiSample.tracks[i].commandCounter!=-1 && midiSample.commands[i][midiSample.tracks[i].commandCounter].command == NOTE_ON){
+				// signal processing
+
+				midiSample.tracks[i].counter += midiSample.commands[i][midiSample.tracks[i].commandCounter].noteNumber;
+				if (midiSample.tracks[i].counter > SAMPLE_RATE-1)
+					midiSample.tracks[i].counter -= SAMPLE_RATE;
+			}
 			i++;
 		}
 		DSK6713_AIC23_write(hCodec, AIC23_data.combo);

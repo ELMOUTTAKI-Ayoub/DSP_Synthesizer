@@ -9,38 +9,51 @@
 #define NOTES_H_
 
 #include "stdint.h"
+#include "definesMidi.h"
 
-/*
+/**
  * Software defines
  */
-#define MUXH 	0x019C0000
-#define PI 		3.14159265359f
-#define VOLUME	1				//max. Lautstaerke
-#define QUARTER_NOTE_TIME 0.5   //Laenge einer 1/4 Note in Sekunden
-#define SAMPLE_RATE 44000
+#define MUXH 				0x019C0000		// Addresse des MUXH
+#define PI 					3.14159265359f	// Zahl PI
+#define VOLUME				1				// max. Lautstaerke
+#define QUARTER_NOTE_TIME 	0.5   			// Laenge einer 1/4 Note in Sekunden
+#define SAMPLE_RATE 		44000			// Samplerate
 
+/**
+ * deklaration der externen Variabelen
+ */
+extern float volume_DSP;			//Lautstärke der DSP Boards
+extern short sinus[SAMPLE_RATE];	//lockuptabelle
 
-extern float volume_DSP;		//output Volume
+/**
+ * Funktion zur Umrechnung aller DeltaTime eines MIDI in eine Samplerate
+ * @param midiSample
+ */
+void convert_delta_time (midiTracks* midiSample);
 
-extern short sinus[SAMPLE_RATE]; 		//lockup table
+/**
+ * Funktion zur Umrechnung aller Notennummern eines MIDI in Frequenzen
+ * @param midiSample
+ */
+void convert_note_number (midiTracks* midiSample);
 
-typedef struct {
-	uint16_t 	freq;
-	uint8_t		canal;
-	uint8_t 	noteOn;
-	uint16_t 	deltaTime;
-	uint16_t 	counter;
-}note;
-
-
+/**
+ * Wandelt Ausgelesene Notenummer in eine Frequenz um.
+ * @param num = Notenwert
+ * @return (int) Frequenzwert
+ */
 int create_note (short num);
 
+/**
+ * Füllt Lookup Tabelle mit dem Sinus-Signal
+ */
 void create_lut_sinus(void);
 
-void volume_up(void);
-
-void volume_down(void);
-
-void fill_toene(note* track, uint8_t trackcount);
+/**
+ * TODO: Kann wieder gelöscht werden.
+ * @param midiSample
+ */
+void fill_toene(midiTracks* midiSample);
 
 #endif /* NOTES_H_ */
