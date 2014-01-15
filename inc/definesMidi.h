@@ -3,9 +3,10 @@
 /*
  * Includes um Funktionalitäten des DSPs zu gewährleisten
  */
-//#include "dsk6713.h"
-//#include "dsk6713_aic23.h"  			//codec, etc.
-//#include "dsk6713config.h"
+/* #include "dsk6713.h"
+ * #include "dsk6713_aic23.h"  			//codec, etc.
+ * #include "dsk6713config.h"
+ */
 
 /*
  * C-Bibliotheken
@@ -43,19 +44,19 @@ static const char TRACK_CHUNK[] = 	{0x4D, 0x54, 0x72, 0x6B};			//ASCII: "MTrk"
 /* Oktaven Offset */
 #define NEXT_OCTAVE					0x000C
 /* MidiDatei */
-#define MIDI_FILE					"Tracks/LoopDemo.mid"
+#define MIDI_FILE					"playMe.mid"
 /* Textausgaben */
 static const char* HEADER_MSG[] = 	{"eine Spur","mehrere synchrone Spuren","mehrere asynchrone Spuren"};
 
 /**************************************************************************************************/
 
 /* Definitionen komplexer Datentypen */
-typedef union {						// Header Daten des HEADERS oder TRACKs
+typedef union {								// Header Daten des HEADERS oder TRACKs
 	unsigned char		data[HEADER_BYTES];
 	int32_t 			header;
 } header;
 
-typedef union {						// repraesentiert einen Chunk, HEADER oder TRACK
+typedef union {								// repraesentiert einen Chunk, HEADER oder TRACK
 	unsigned char		data[TRACK_BYTES];
 	int32_t 			chunk;
 } chunk;
@@ -65,7 +66,7 @@ typedef union {
 	int32_t 			size;
 } size;
 
-typedef union {						// dieses Datenfeld existiert nur im Header
+typedef union {								// dieses Datenfeld existiert nur im Header
 	unsigned char		data[HEADER_SIZE];
 	int16_t				field[HEADER_SIZE/2];
 } field;
@@ -88,12 +89,12 @@ typedef struct {
 	size				size;
 } trackChunk;
 
-typedef struct {				// Typedef welches die Tracks der weiteren
+typedef struct {						// Typedef welches die Tracks der weiteren
 	int8_t 				numTracks;		// Verarbeitung zur Verfuegung stellt
 	trackChunk* 		tracks;
 	command**			commands;
 } midiTracks;
 
-extern midiTracks globalTracks;
+//extern midiTracks globalTracks;
 
 #endif /* DEFINES_H_ */

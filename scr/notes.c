@@ -8,7 +8,7 @@
 #include "math.h"
 
 note s_note;
-//short sinus[SAMPLE_RATE]; 			//lockup table
+short sinus[SAMPLE_RATE]; 			//lockup table
 //uint8_t i= 0, toggle= 1;
 union toene;
 

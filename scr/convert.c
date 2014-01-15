@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+
 int last, first;
 
 int convertHeader (headerChunk* sample, const char* index){
@@ -31,7 +32,7 @@ int convertHeader (headerChunk* sample, const char* index){
 	return (2*HEADER_SIZE+HEADER_BYTES);
 }
 
-int convertTrack (trackChunk* sample, const char* index){
+int convertTrack (trackChunk* sample, const char* index, midiTracks* tracks){
 	unsigned char offset = 0;
 
 	memcpy(sample->chunk.data, &index[offset], TRACK_BYTES);
@@ -48,14 +49,14 @@ int convertTrack (trackChunk* sample, const char* index){
 			sample->size.data[first] ^= sample->size.data[last];
 	}
 
+	tracks->numTracks = tracks->numTracks + 1;
+	tracks->tracks = (trackChunk*)realloc(tracks->tracks, tracks->numTracks * sizeof(trackChunk));
+
+	printf(" %d %d", tracks->numTracks, (int)sizeof(tracks->tracks));
+
 	return (sample->size.size);
 }
 
-//int convertMidi (int argc, char **argv, midiTracks* sample, const char* index){
-//	unsigned char offset = 0;
-//
-//	return (sample->tracks);
-//}
 
 int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* trackSample) {
 
@@ -65,9 +66,12 @@ int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* tr
 	char* buffer;
 	size_t result;
 	int i;
+	midiTracks* tracks;
+	tracks = (midiTracks*)malloc(sizeof(midiTracks));
+	tracks->numTracks = 0;
 
 	/*
-	 * Wünscht der Nutzer die Ausgabe der kompletten Datei ASCII-kodiert,
+	 * Wuenscht der Nutzer die Ausgabe der kompletten Datei ASCII-kodiert,
 	 * so hat er den Verbose Mode mit dem Parameter -v aktiviert.
 	 */
 	if (argc>1 && argv[1][1]=='v') {
@@ -76,13 +80,13 @@ int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* tr
 	}
 
 	if ((pFile = fopen(MIDI_FILE, "rb")) == 0) {
-		fprintf(stderr, "\nDas Lesen der MIDI-Datei ist fehlgeschlagen");
+		fprintf(stderr, "\nDas Lesen der MIDI-Datei ist fehlgeschlagen\n");
 		exit(1);
 	}
 
 	/*
 	 * Der Dateizeiger wird mit dem Aufruf von fseek() ans Ende der Datei gesetzt
-	 * und sollte somit fï¿½r das spï¿½tere einlesen wieder an den Anfang gesetzt werden.
+	 * und sollte somit fuer das spaetere einlesen wieder an den Anfang gesetzt werden.
 	 */
 	fseek (pFile , 0 , SEEK_END);
 	lSize = ftell (pFile);
@@ -112,17 +116,35 @@ int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* tr
 		}
 		else if (memcmp(&buffer[i],TRACK_CHUNK,TRACK_BYTES) == 0) {
 			//trackChunk sample;
-			i += convertTrack(trackSample, &buffer[i]);
+			//i += convertTrack(trackSample, &buffer[i]);
 
 			printf("\nTRACK:\tNummer %u gefunden, mit einer Laenge von %i-Bytes", trkNmbr++, trackSample->size.size);
+			printf(" %X.%X.%X", (unsigned char)buffer[i], (unsigned char)buffer[i+1], (unsigned char)buffer[i+2]);
+			printf(" %X", (unsigned char)buffer[0]);
+
+			i += convertTrack(trackSample, &buffer[i], tracks);
 		}
 		if (verbose == 1) {
 			buffer[i]=='\n' ? printf("\n") : printf("%X", (unsigned int)buffer[i]);
 		}
 	}
 
+	/*
+	 * Stefan Oppel - MATLAB example:
+	 * if ~(Dateiname==0)
+	 */
+
 	printf("\n");
 	fclose(pFile);
 	free(buffer);
-	return 0;
+	return(0);
+}
+
+int main(int argc, char **argv) {
+	headerChunk* 	foo = (headerChunk*)malloc(sizeof(headerChunk));
+	trackChunk*		bar = (trackChunk*)malloc(sizeof(trackChunk));
+
+	convertMidi(argc, argv, foo, bar);
+
+	return(0);
 }

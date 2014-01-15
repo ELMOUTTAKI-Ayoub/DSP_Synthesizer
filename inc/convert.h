@@ -5,7 +5,7 @@
 
 int convertHeader (headerChunk* sample, const char* index);
 
-int convertTrack (trackChunk* sample, const char* index);
+int convertTrack (trackChunk* sample, const char* index, midiTracks* tracks);
 
 int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* trackSample);
 

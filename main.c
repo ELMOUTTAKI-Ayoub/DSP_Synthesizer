@@ -39,7 +39,7 @@ uint8_t trackCount = 1;
 extern far void vectors();         //external function
 
 /*
- * Aller 1/128 Note wird diese Funktion ausgeführt
+ * Aller 1/128 Note wird diese Funktion ausgefuehrt
  */
 void control_time(){
 
@@ -119,20 +119,20 @@ void main(int argc, char **argv) {
 	headerChunk headerSample;
 	trackChunk trackSample;
 	convertMidi(argc, argv, &headerSample, &trackSample);						//Einlesen einer Midi-Datei
-	//printf("\nTRACK:\tNummer %u gefunden, mit einer Länge von %i-Bytes", trackSample->size.size);
+	//printf("\nTRACK:\tNummer %u gefunden, mit einer Lï¿½nge von %i-Bytes", trackSample->size.size);
 
 	oneTick = headerSample.field.field[0] / 32;  								// 1Tick = ( TimeDevision / 1/4Note ) * 1/128Note
-	timePerTick = oneTick * (QUARTER_NOTE_TIME / headerSample.field.field[0]);	// Länge einer 1/128 Note
+	timePerTick = oneTick * (QUARTER_NOTE_TIME / headerSample.field.field[0]);	// Lï¿½nge einer 1/128 Note
 	//trackCount = headerSample.field.field[1];									// Anzahl der Tracks in einer MIDI-Datei
 	trackCount = 3;
 	track = malloc(trackCount*sizeof(int));										// Anlegen des Track-Arrays
 
 	if( NULL == track ) {
-	      printf("\nFehler: Es konnten keine Tracks angelegt werden. Mögliche Ursache: Kein freier Speicherplatz vorhanden.");
+	      printf("\nFehler: Es konnten keine Tracks angelegt werden. Mï¿½gliche Ursache: Kein freier Speicherplatz vorhanden.");
 	  //    return EXIT_FAILURE;
 	}
 
-	//füllen der Trackspuren mit Signalen
+	//fï¿½llen der Trackspuren mit Signalen
 //	while (i < trackCount) {
 //		track[i].freq = create_note(69);	// TODO: muss noch angepasst werden...
 //		i++;
