@@ -1,7 +1,6 @@
-#include "convert.h"
+#include "../inc/convert.h"
 
 #include <string.h>
-
 
 int last, first;
 
@@ -31,6 +30,82 @@ int convertHeader (headerChunk* sample, const char* index){
 
 	return (2*HEADER_SIZE+HEADER_BYTES);
 }
+uint32_t noteOn=0;
+
+uint32_t noteOff=0;
+
+int convertEvent (trackChunk* sample, const char* index){
+	uint32_t offset = 0;
+	uint32_t deltaTime=0;
+	while(index[offset] & 0b10000000){
+		deltaTime += index[offset++] & 0b01111111;
+	}
+	deltaTime += index[offset++] & 0b01111111;
+
+	//printf("Delta Time %d \n",deltaTime);
+	uint8_t event = EVENT_MASK & index[offset];
+	switch(event){
+		case NOTE_ON :
+		{
+			printf("\tNote On \n");
+			noteOn++;
+			break;
+		}
+		case NOTE_OFF :
+		{
+			printf("\tNote Off \n");
+			noteOff++;
+			break;
+		}
+		case POLYPHONIC_PRESSURE :
+		{
+			printf("\tPOLYPHONIC PRESSURE \n");
+			offset+=3;
+			break;
+		}
+		case CONTROL_CHANGE :
+		{
+			printf("\tCONTROL CHANGE \n");
+			offset+=3;
+			break;
+		}
+		case PROGRAMM_CHANGE :
+		{
+			printf("\tPROGRAMM CHANGE \n");
+			offset+=2;
+			break;
+		}
+		case CHANNEL_PRESSURE :
+		{
+			printf("\tCHANNEL PRESSURE \n");
+			offset+=2;
+			break;
+		}
+		case PITCH_BENDING :
+		{
+			printf("\tPITCH BENDING \n");
+			offset+=2;
+			break;
+		}
+		case SYSTEM_EXCLUSIVE :
+		{
+			printf("\tSYSTEM EXCLUSIVE \n");
+			offset+=2;
+			break;
+		}
+		default :
+		{
+			printf("\tMeta \n");
+			if(!(index[offset]&0xFF)){
+				//META Event wayne train
+				offset+=2;
+				offset+=((uint8_t)index[offset]+1);
+			}
+		}
+	}
+	return offset;
+}
+
 
 int convertTrack (trackChunk* sample, const char* index, midiTracks* tracks){
 	unsigned char offset = 0;
@@ -51,6 +126,14 @@ int convertTrack (trackChunk* sample, const char* index, midiTracks* tracks){
 
 	tracks->numTracks = tracks->numTracks + 1;
 	tracks->tracks = (trackChunk*)realloc(tracks->tracks, tracks->numTracks * sizeof(trackChunk));
+
+
+    printf("\n");
+    uint32_t t_index=0;
+    while(sample->size.size>t_index){
+        t_index+=convertEvent(sample,&index[offset+2*TRACK_BYTES+t_index]);
+    }
+
 
 	printf(" %d %d", tracks->numTracks, (int)sizeof(tracks->tracks));
 
@@ -122,13 +205,14 @@ int convertMidi(int argc, char **argv, headerChunk* headerSample, trackChunk* tr
 			printf(" %X.%X.%X", (unsigned char)buffer[i], (unsigned char)buffer[i+1], (unsigned char)buffer[i+2]);
 			printf(" %X", (unsigned char)buffer[0]);
 
-			i += convertTrack(trackSample, &buffer[i], tracks);
+			//TODO vielleicht noch + Track Header Size
+			i += convertTrack(trackSample, &buffer[i], tracks)+2*TRACK_BYTES-1;
 		}
 		if (verbose == 1) {
 			buffer[i]=='\n' ? printf("\n") : printf("%X", (unsigned int)buffer[i]);
 		}
 	}
-
+	printf("On: %d Off: %d",noteOn,noteOff);
 	/*
 	 * Stefan Oppel - MATLAB example:
 	 * if ~(Dateiname==0)

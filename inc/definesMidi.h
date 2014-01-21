@@ -25,15 +25,16 @@
 /*
  * Software defines
  */
+#define EVENT_MASK					0xF0
 /* Midi Statusbytes */
-#define	NOTE_OFF					0x0008
-#define	NOTE_ON						0x0009
-#define POLYPHONIC_PRESSURE			0x000A
-#define	CONTROL_CHANGE				0x000B
-#define	PROGRAMM_CHANGE				0x000C
-#define CHANNEL_PRESSURE			0x000D
-#define PITCH_BENDING				0x000E
-#define SYSTEM_EXCLUSIVE			0x000F
+#define	NOTE_OFF					0x80
+#define	NOTE_ON						0x90
+#define POLYPHONIC_PRESSURE			0xA0
+#define	CONTROL_CHANGE				0xB0
+#define	PROGRAMM_CHANGE				0xC0
+#define CHANNEL_PRESSURE			0xD0
+#define PITCH_BENDING				0xE0
+#define SYSTEM_EXCLUSIVE			0xF0
 /* Midi Header und Track Chunk */
 static const char HEADER_CHUNK[] =  {0x4D, 0x54, 0x68, 0x64};			//ASCII: "MThd"
 #define HEADER_BYTES				0x0004
@@ -87,8 +88,8 @@ typedef struct {
 
 typedef struct {
 	chunk 				chunk;
-	size				size;
-	uint16_t 			counter;			// Zähler für Sinuserzäugung
+	size				size;               // Anzahl der Events
+	uint16_t 			counter;			// Zähler für Sinuserzeugung
 	uint16_t			delayCounter;		// Zähler bis zum nächsten Ereignis
 	int16_t			commandCounter;		// Platzhalter für das aktuell ausführende Event; -1 kein Commando
 } trackChunk;
