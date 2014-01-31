@@ -7,12 +7,9 @@
 #include "notes.h"
 #include "math.h"
 
-note s_note;
-short sinus[SAMPLE_RATE]; 			//lockup table
-//uint8_t i= 0, toggle= 1;
-union toene;
+short sinusLUT[SAMPLE_RATE]; 			//lockup table
 
-//note test_midi[] = {event1, event2, event3, event4, event5, event6, event7, event8  };
+
 
 /**
  * Wandelt Ausgelesene Notenummer in eine Frequenz um.
@@ -42,6 +39,7 @@ int create_note (short num) {
 	/* Berechnung der Frequenz
 	 *   f= c * 2^(num/12)
 	 */
+	div=(float)(num)/12.0f;
 	return (int)(c * powf(2.0f, div));
 }
 
@@ -56,13 +54,13 @@ void create_lut_sinus(void) {
 
 	for (i = 0; i < SAMPLE_RATE; ++i) {
 		// sinus sin(2 * pi * f * t)
-		sinus[i] = (short)(0X7FFF*sin(x));
+		sinusLUT[i] = (short)(0X7FFF*sin(x));
 		x = 2*PI*i/SAMPLE_RATE;
 	}
 }
 
 /**
- * Umwandlung aller DeltaTime des Midi in ein atequate Samplerate
+ * Umwandlung aller DeltaTime des Midi in ein adäquate  Samplerate
  * @param midiSample
  */
 void convert_delta_time (midiTracks* midiSample) {
@@ -83,9 +81,9 @@ void convert_delta_time (midiTracks* midiSample) {
 			 * TODO: schiften mit >> 4 bewirkt das max. 16s ein erneutes Event aufgerufen werden muss.
 			 */
 			midiSample->commands[track_index][event_index].deltaTime = (uint32_t)( (midiSample->commands[track_index][event_index].deltaTime * QUARTER_NOTE_TIME / time_dev) * SAMPLE_RATE ) >> 4;
-			event_index++;	// sring zum nächsten Event
+			event_index++;	// zum nächsten Event
 		}
-		track_index++;	// spring zum nächsten Track
+		track_index++;	// zum nächsten Track
 	}
 }
 
@@ -97,17 +95,17 @@ void convert_note_number (midiTracks* midiSample) {
 
 	uint8_t track_index=0;
 	// durchläuft jeden Track
-	while (track_index < midiSample.numTracks) {
+	while (track_index < midiSample->numTracks) {
 
 		uint8_t event_index=0;
 		// durchläuft in jedem Track die Events
-		while (event_index < midiSample.tracks[track_index].size.size) {
+		while (event_index < midiSample->tracks[track_index].size.size) {
 
 			// Umwandlung der Notennummer eines Events in eine Frequenz
-			midiSample.commands[track_index][event_index].noteNumber = create_note((short)midiSample.commands[track_index][event_index].noteNumber);
-			event_index++;	// sring zum nächsten Event
+			midiSample->commands[track_index][event_index].noteNumber = create_note((short)midiSample->commands[track_index][event_index].noteNumber);
+			event_index++;	// zum nächsten Event
 		}
-		track_index++;	// spring zum nächsten Track
+		track_index++;	//  zum nächsten Track
 	}
 }
 

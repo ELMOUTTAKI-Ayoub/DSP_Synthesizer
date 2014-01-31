@@ -24,7 +24,7 @@
  * deklaration der externen Variabelen
  */
 extern float volume_DSP;			//Lautstärke der DSP Boards
-extern short sinus[SAMPLE_RATE];	//lockuptabelle
+extern short sinusLUT[SAMPLE_RATE];	//lockuptabelle
 
 /**
  * Funktion zur Umrechnung aller DeltaTime eines MIDI in eine Samplerate

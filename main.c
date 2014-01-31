@@ -21,9 +21,8 @@
  * Globale Variabelen
  */
 DSK6713_AIC23_CodecHandle hCodec;
-Uint32 		fs = DSK6713_AIC23_FREQ_44KHZ; 	// setzen der Sampling-Rate (8, 16, 44, 96 kHz)
+uint32_t 		fs = DSK6713_AIC23_FREQ_44KHZ; 	// setzen der Sampling-Rate (8, 16, 44, 96 kHz)
 
-//Uint16 		eventId1;
 midiTracks 	midiSample;
 trackChunk 	midiTrack[16];
 command 	midiCommands[16*200];
@@ -31,19 +30,12 @@ command* 	midiCommandsPointer[16];
 short 		counter = 0;
 short 		index = 0;
 float 		volume_DSP = 1.0f;			// external DSP-Board Volume
-//short oneTick = 0;
-//float timePerTick = 0;
-short 		sinus[SAMPLE_RATE]; 		// Lockup Tabelle
 uint8_t 	tmp, i = 0;
 
-/**
- * Marc's declatation
- */
-//uint8_t trackCount = 1;
-/***************************/
 
-/*
- * Aller 1/128 Note wird diese Funktion ausgefuehrt
+
+/**
+ * Externe Funktion
  */
 extern far void vectors();
 
@@ -126,33 +118,22 @@ void interupt_config() {
 
 int main(int argc, char **argv) {
 
-	union {Uint32 combo;short channel[2];} AIC23_data;
+	union {uint32_t combo;short channel[2];} AIC23_data;
 
-	headerChunk headerSample;
-	trackChunk trackSample;
-	convertMidi(argc, argv, &headerSample, &trackSample);						//Einlesen einer Midi-Datei
-	//printf("\nTRACK:\tNummer %u gefunden, mit einer L�nge von %i-Bytes", trackSample->size.size);
+	//headerChunk headerSample;
+	//trackChunk trackSample;
 
-	oneTick = headerSample.field.field[0] / 32;  								// 1Tick = ( TimeDevision / 1/4Note ) * 1/128Note
-	timePerTick = oneTick * (QUARTER_NOTE_TIME / headerSample.field.field[0]);	// L�nge einer 1/128 Note
-	//trackCount = headerSample.field.field[1];									// Anzahl der Tracks in einer MIDI-Datei
-	trackCount = 3;
-	track = malloc(trackCount*sizeof(int));										// Anlegen des Track-Arrays
+	midiSample.tracks = midiTrack;
+	uint8_t t_index=0;
 
-	if( NULL == track ) {
-	      printf("\nFehler: Es konnten keine Tracks angelegt werden. M�gliche Ursache: Kein freier Speicherplatz vorhanden.");
-	  //    return EXIT_FAILURE;
+	while(t_index<16){
+		midiCommandsPointer[t_index]=&midiCommands[200*t_index];
+		t_index++;
 	}
 	midiSample.commands = midiCommandsPointer;
 
-	//f�llen der Trackspuren mit Signalen
-//	while (i < trackCount) {
-//		track[i].freq = create_note(69);	// TODO: muss noch angepasst werden...
-//		i++;
-//	}
-
-	//oneTick = headerSample.field.field[0] / 32;  								// 1Tick = ( TimeDevision / 1/4Note ) * 1/128Note
-	//timePerTick = oneTick * (QUARTER_NOTE_TIME / headerSample.field.field[0]);	// Laenge einer 1/128 Note
+	create_lut_sinus();		// fill the Lookup Table with the Sinus-Signal
+	//convertMidi(argc, argv, &headerSample, &trackSample);						// Einlesen einer Midi-Datei
 
 	fill_toene(&midiSample);
 	convert_delta_time(&midiSample);
@@ -168,7 +149,7 @@ int main(int argc, char **argv) {
 		AIC23_data.combo=0;
 		i=0;
 		while (i < midiSample.numTracks) {
-			uint16_t t_data = sinus[midiSample.tracks[i].counter] >> 4;
+			uint16_t t_data = sinusLUT[midiSample.tracks[i].counter] >> 4;
 			AIC23_data.channel[LEFT] += t_data;
 			AIC23_data.channel[RIGHT] += t_data;
 			// wenn ... und Note ON
