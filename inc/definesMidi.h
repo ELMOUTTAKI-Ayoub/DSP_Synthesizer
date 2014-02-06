@@ -35,6 +35,14 @@
 #define CHANNEL_PRESSURE			0xD0
 #define PITCH_BENDING				0xE0
 #define SYSTEM_EXCLUSIVE			0xF0
+
+/* Meta Events*/
+#define CHANNEL_SCOPE				0x21
+#define TRACK_END 					0x2F
+#define TEMPO_CHANGE				0x51
+#define SMPTE_OFFSET				0x54
+#define TIME_SIGNATURE				0x58
+#define KEY_SIGNATURE				0x59
 /* Midi Header und Track Chunk */
 static const char HEADER_CHUNK[] =  {0x4D, 0x54, 0x68, 0x64};			//ASCII: "MThd"
 #define HEADER_BYTES				0x0004
@@ -45,7 +53,7 @@ static const char TRACK_CHUNK[] = 	{0x4D, 0x54, 0x72, 0x6B};			//ASCII: "MTrk"
 /* Oktaven Offset */
 #define NEXT_OCTAVE					0x000C
 /* MidiDatei */
-#define MIDI_FILE					"playMe.mid"
+#define MIDI_FILE					"../playMe.mid"
 /* Textausgaben */
 static const char* HEADER_MSG[] = 	{"eine Spur","mehrere synchrone Spuren","mehrere asynchrone Spuren"};
 
@@ -73,11 +81,11 @@ typedef union {								// dieses Datenfeld existiert nur im Header
 } field;
 
 typedef struct {							// das Kommando besteht aus zwei Bytes
-	uint16_t				command;// welche Nibble-Weise Informationen enthalten
-	uint16_t				channel;
-	uint16_t				deltaTime;
-	uint16_t				noteNumber;
-	uint16_t				noteVelocity;
+	uint16_t			command;// welche Nibble-Weise Informationen enthalten
+	uint16_t			channel;
+	uint16_t			deltaTime;
+	uint16_t			noteNumber;
+	uint16_t			noteVelocity;
 } command;
 
 typedef struct {
