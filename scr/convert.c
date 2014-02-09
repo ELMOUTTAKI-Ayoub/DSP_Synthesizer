@@ -369,8 +369,7 @@ void printCommand( command com )
 
   if ( fd != NULL )
   {
-    fprintf( fd, "    {0x%02X, 0x%04X, 0x%02X},\n", ( ( com.command << 4 ) | com.channel ), com.deltaTime, com.noteNumber );
-    const uint8_t foo = ( ( 4 << com.command ) | com.channel );
+    fprintf( fd, "    {0x%02X,0x%02X, 0x%04X, 0x%02X},\n",   com.command  , com.channel , com.deltaTime, com.noteNumber );
     fclose( fd );
   }
 }
