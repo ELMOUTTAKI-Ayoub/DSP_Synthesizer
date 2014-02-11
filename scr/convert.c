@@ -273,13 +273,8 @@ int convertMidi( int argc, char **argv, headerChunk* headerSample )
     }
     else if ( memcmp( &buffer[i], TRACK_CHUNK, TRACK_BYTES ) == 0 )
     {
-      //trackChunk sample;
-      //i += convertTrack(trackSample, &buffer[i]);
-
       tracks->numTracks = tracks->numTracks + 1;
       tracks->tracks = (trackChunk*) realloc( tracks->tracks, tracks->numTracks * sizeof(trackChunk) );
-
-      //TODO vielleicht noch + Track Header Size
 
       printCommadBegin( tracks->numTracks );
       printBeginCommand();

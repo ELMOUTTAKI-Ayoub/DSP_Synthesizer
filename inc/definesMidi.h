@@ -39,7 +39,7 @@
 /*
  * Midi Header und Track Chunk
  */
-static const char HEADER_CHUNK[] = { 0x4D, 0x54, 0x68, 0x64 };       //ASCII: "MThd"
+static const char HEADER_CHUNK[] = { 0x4D, 0x54, 0x68, 0x64 };      //ASCII: "MThd"
 #define HEADER_BYTES              0x0004
 #define HEADER_SIZE               0x0006
 static const char TRACK_CHUNK[] = { 0x4D, 0x54, 0x72, 0x6B };       //ASCII: "MTrk"
@@ -48,8 +48,8 @@ static const char TRACK_CHUNK[] = { 0x4D, 0x54, 0x72, 0x6B };       //ASCII: "MT
 /* Oktaven Offset */
 #define NEXT_OCTAVE               0x000C
 /* MidiDateien */
-#define MIDI_FILE                 "playMe.mid"
-#define MIDI_FILE_OUT             "playMe.h"
+#define MIDI_FILE                 "../Alle_Meine_Entchen.mid"
+#define MIDI_FILE_OUT             "../playMe.h"
 /* Textausgaben */
 static const char* HEADER_MSG[] = { "eine Spur", "mehrere synchrone Spuren", "mehrere asynchrone Spuren" };
 
